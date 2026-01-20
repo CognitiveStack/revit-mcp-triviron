@@ -33,8 +33,6 @@ def register_code_execution_routes(api):
             # Handle both string and bytes data from the HTTP request
             if isinstance(request.data, bytes):
                 request_data = request.data.decode('utf-8', errors='replace')
-            elif isinstance(request.data, str):
-                request_data = request.data
             else:
                 request_data = request.data
             

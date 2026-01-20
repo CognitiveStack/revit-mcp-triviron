@@ -19,7 +19,10 @@ try:
 except Exception as e:
     # If the encoding provider cannot be registered, log a warning
     # but don't fail startup as this may not be needed in all .NET versions
-    pass
+    import logging
+    logging.getLogger(__name__).warning(
+        "Could not register CodePages encoding provider: %s", str(e)
+    )
 
 logger = logging.getLogger(__name__)
 
