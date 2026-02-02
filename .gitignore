@@ -1,12 +1,8 @@
-# Python-generated files
-__pycache__/
-*.py[oc]
-build/
-dist/
-wheels/
-*.egg-info
-
-# Virtual environments
+.playwright-mcp
+.env
 .venv
-
-*TODO.md
+node_modules
+.pytest_cache
+.ruff_cache
+.vscode
+__pycache__

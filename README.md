@@ -1,403 +1,406 @@
-# Revit MCP Python
 
-## A pyRevit-oriented implementation of the Model Context Protocol (MCP) for Autodesk Revit
+# Claude Code Project Template
 
-## **How?**
+A structured template for building applications with Claude Code using the **PIV Loop** workflow (Prime → Implement → Validate).
 
-- This minimal implementation leverages the Routes module inside pyRevit to create a bridge between Revit and Large Language Models (LLMs).
-- It provides a straightforward template to get started quickly, letting you prototype and iterate tools to give LLMs access to your Revit models.
-- These tools are designed to be expanded for your specific use cases. You're very welcome to fork the repo and make your own contributions.
-- **Note:** The pyRevit Routes API is currently in draft form and subject to change. It lacks built-in authentication mechanisms, so you'll need to implement your own security measures for production use.
-
-## **Batteries Included**
-
-This repo is aimed at:
-- Beginners to the Revit API
-- Python specialists who aren't versed in C#
-- Anyone wanting to prototype and iterate quickly with LLMs and Revit
-
-It contains:
-- A complete Routes implementation for pyRevit
-- A minimal MCP server script to connect to any MCP-compatible client
-- Several test commands to get you started right away
-
-## Key Architecture Components
-
-
-1.  **MCP Server (`main.py`)**:
-
-- Built with FastMCP
-- Handles HTTP communication with Revit Routes API
-- Registers tools from modular tool system
-- Provides helper functions for GET/POST/Image requests
-
-2.  **pyRevit Extension (`revit-mcp-python.extension/`)**:
-
-- Contains the Routes API that runs inside Revit
-- Modular route registration in `startup.py`
-- Individual route modules in `revit_mcp/` directory
-
-3.  **Tool Registration System (`tools/`)**:
-
-- Modular tool organization by functionality
-- Central registration through `tools/__init__.py`
-- Each module registers its own tools with the MCP server
-
+This template provides slash commands, reference documentation, and best practices for AI-assisted development.
 
 ---
 
-## **Supported Tools**
+## What's Included
 
+```
+.claude/
+├── commands/
+│   ├── core_piv_loop/       # Prime, plan, execute commands
+│   ├── validation/          # Code review, testing, reports
+│   ├── github_bug_fix/      # RCA and bug fix workflow
+│   ├── commit.md            # Atomic commit helper
+│   ├── create-prd.md        # PRD generator
+│   └── init-project.md      # Project initialization
+├── reference/
+│   ├── fastapi-best-practices.md
+│   ├── caddy-patterns.md
+│   ├── uv-python-workflow.md
+│   ├── deployment-best-practices.md
+│   ├── sqlite-best-practices.md
+│   ├── react-frontend-best-practices.md
+│   └── testing-and-logging.md
+└── PRD.md                   # Product Requirements Document
+```
 
-### **Current Implementation Status**
+---
 
-| Tool Name | Status | Category | Description |
-|-----------|--------|----------|-------------|
-| `get_revit_status` | ✅ Implemented | Status & Connectivity | Check if the Revit MCP API is active and responding |
-| `get_revit_model_info` | ✅ Implemented | Model Information | Get comprehensive information about the current Revit model |
-| `list_levels` | ✅ Implemented | Model Information | Get all levels with elevation information |
-| `get_revit_view` | ✅ Implemented | View & Image | Export a specific Revit view as an image |
-| `list_revit_views` | ✅ Implemented | View & Image | Get a list of all exportable views organized by type |
-| `place_family` | ✅ Implemented | Family & Placement | Place a family instance at specified location with custom properties |
-| `list_families` | ✅ Implemented | Family & Placement | Get a flat list of available family types (with filtering) |
-| `list_family_categories` | ✅ Implemented | Family & Placement | Get a list of all family categories in the model |
-| `get_current_view_info` | ✅ Implemented | View Information | Get detailed information about the currently active view |
-| `get_current_view_elements` | ✅ Implemented | View Information | Get all elements visible in the current view |
-| `create_point_based_element` | ✅ Implemented | Element Creation | Create point-based elements (doors, windows, furniture) |
-| `color_splash` | ✅ Implemented | Visualization | Color elements based on parameter values |
-| `execute_revit_code` | ✅ Implemented | Code Execution | Execute IronPython code directly in Revit context |
-| `get_selected_elements` | 🔄 Pending | Selection Management | Get information about currently selected elements |
-| `create_line_based_element` | 🔄 Pending | Element Creation | Create line-based elements (walls, beams, pipes) |
-| `create_surface_based_element` | 🔄 Pending | Element Creation | Create surface-based elements (floors, ceilings) |
-| `delete_elements` | 🔄 Pending | Element Management | Delete specified elements from the model |
-| `modify_element` | 🔄 Pending | Element Management | Modify element properties (instance parameters) |
-| `reset_model` | 🔄 Pending | Element Management | Reset model by deleting process model elements |
-| `tag_walls` | 🔄 Pending | Annotation | Tag all walls in the current view |
-| `search_modules` | 🔄 Pending | Integration | Search for available modules/addins |
-| `use_module` | 🔄 Pending | Integration | Execute functionality from external modules |
+## Quick Start
 
+### Option A: New Project (GitHub Template) ⭐ Recommended
 
-![Claude listing model elements in the Desktop interface](images/list_model_tool.png)
+The easiest way — creates a fresh repository with no git history from this template.
 
-![Claude getting a view in the Desktop interface](images/get_view_tool.png)
+1. **Click "Use this template"** (green button at top of this repo)
+2. **Select "Create a new repository"**
+3. **Name your repository** and choose public/private
+4. **Click "Create repository"**
 
-
-## Getting Started
-
-### Installing uv:
-
-> Refer to ./README_UV.md
-
-## Installing the Extension on Revit
-
-# Activate pyRevit Routes
-
-1. In Revit, navigate to the pyRevit tab
-2. Open Settings
-3. Go to `Routes` > activate `Routes Server`
-pyRevit will start listening on port `http://localhost:48884/`
-
-# Install from pyRevit:
-
-1. In Revit, navigate to the pyRevit tab
-2. Open Extensions
-3. Select the Revit MCP Extension > Install extension
-4. Select location, default is `%APPDATA%\Roaming\pyRevit\Extensions`
-5. Enable and wait for pyRevit to reload. Restart Revit if necessary.
-
-
-# Manual Installation on a custom directory:
-
-1. Clone the repo in a custom location:
-    ```bash
-    git clone https://github.com/revit-mcp/revit-mcp-python
-    ```
-2. Add `.extension` to the root folder name
-3. In Revit, navigate to the pyRevit tab
-4. Open Settings
-5. Under "Custom Extensions", add the path to the `.extension` folder
-6. Save settings and reload pyRevit (you might need to restart Revit entirely)
-
-## Testing Your Connection
-
-Once installed, test that the Routes API is working:
-
-1. Open your web browser and go to:
-   ```
-   http://localhost:48884/revit_mcp/status/
-   ```
-
-2. If successful, you should see a response like:
-   ```json
-   {"status": "active",
-    "health": "healthy",
-    "revit_available": true,
-    "document_title": "your_revit_filename",
-    "api_name": "revit_mcp"}
-   ```
-
-The Routes Service will now load automatically whenever you start Revit. To disable it, simply remove the extension path from the pyRevit settings.
-
-## Using the MCP Client
-
-### Testing with the MCP Inspector
-
-The MCP SDK includes a handy inspector tool for debugging:
+You now have a clean copy with its own git history. Clone and start building:
 
 ```bash
-mcp dev main.py
+git clone https://github.com/YOUR_USERNAME/your-new-project.git
+cd your-new-project
+claude  # Start Claude Code
 ```
 
-Then access `http://127.0.0.1:6274` in your browser to test your MCP server interactively.
+---
 
-### Transport Modes
+### Option B: New Project (Manual Clone)
 
-The MCP server supports multiple transport modes for different use cases:
-
-| Flag | Transport | Endpoints | Use Case |
-|------|-----------|-----------|----------|
-| (none) | stdio | stdin/stdout | Claude Desktop default |
-| `--sse` | SSE only | `/sse`, `/messages/` | Legacy clients |
-| `--streamable-http` | HTTP only | `/mcp` | Modern HTTP clients |
-| `--combined` | Both | All above | Maximum compatibility |
-
-**Running with combined transport (recommended for HTTP):**
-```bash
-uv run --with "mcp[cli]" main.py --combined
-```
-
-This starts the server on `http://127.0.0.1:8000` with both SSE and streamable-HTTP endpoints available.
-
-**Testing the endpoints:**
-```bash
-# Test streamable-http
-curl -X POST http://localhost:8000/mcp
-
-# Test SSE
-curl http://localhost:8000/sse
-```
-
-### Connecting to Claude Desktop
-
-The simplest way to install your MCP server in Claude Desktop:
+If you prefer command-line or need more control:
 
 ```bash
-mcp install main.py
+# 1. Clone the template
+git clone https://github.com/journeyman33/claude-code-template.git my-new-project
+cd my-new-project
+
+# 2. Remove git history and start fresh
+rm -rf .git
+git init
+git add .
+git commit -m "Initial commit from Claude Code template"
+
+# 3. Create your GitHub repo and push
+gh repo create my-new-project --public --source=. --push
+# Or manually:
+# git remote add origin https://github.com/YOUR_USERNAME/my-new-project.git
+# git push -u origin main
+
+# 4. Start Claude Code
+claude
 ```
 
-Or for manual installation:
+---
 
-1. Open Claude Desktop → Settings → Developer → Edit Config
-2. Add this to the `mcpServers` section:
+### Option C: Existing Project
 
-```json
-{
-  "mcpServers": {
-    "Revit Connector": {
-      "command": "uv",
-      "args": [
-        "run",
-        "--with",
-        "mcp[cli]",
-        "mcp",
-        "run",
-        "/absolute/path/to/main.py"
-      ]
-    }
-  }
-}
+Add the Claude Code workflow to a repository you already have.
+
+```bash
+# 1. Clone the template temporarily
+git clone --depth 1 \
+  https://github.com/journeyman33/claude-code-template.git /tmp/claude-template
+
+# 2. Copy the .claude directory to your project
+cp -r /tmp/claude-template/.claude /path/to/your/project/
+
+# 3. Copy the CLAUDE.md template
+cp /tmp/claude-template/CLAUDE.template.md /path/to/your/project/CLAUDE.md
+
+# 4. Clean up
+rm -rf /tmp/claude-template
+
+# 5. Customize CLAUDE.md for your project
+cd /path/to/your/project
+# Edit CLAUDE.md with your project details
+
+# 6. Commit
+git add .claude/ CLAUDE.md
+git commit -m "feat: add Claude Code workflow"
 ```
 
-For HTTP transport mode, configure Claude Desktop with:
-```json
-{
-  "mcpServers": {
-    "Revit Connector": {
-      "url": "http://localhost:8000/mcp"
-    }
-  }
-}
+---
+
+## The PIV Loop Workflow
+
+This template follows the **PIV Loop** — a structured approach to AI-assisted development:
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                                                         │
+│    ┌─────────┐     ┌─────────────┐     ┌──────────┐    │
+│    │  PRIME  │ ──► │  IMPLEMENT  │ ──► │ VALIDATE │    │
+│    └─────────┘     └─────────────┘     └──────────┘    │
+│         │                                    │          │
+│         └────────────────────────────────────┘          │
+│                      (iterate)                          │
+└─────────────────────────────────────────────────────────┘
 ```
 
-# Creating Your Own Tools
+| Phase | What Happens | Commands |
+|-------|--------------|----------|
+| **Prime** | Load context, understand codebase | `/core_piv_loop:prime` |
+| **Implement** | Plan and execute features | `/core_piv_loop:plan-feature`, `/core_piv_loop:execute` |
+| **Validate** | Test, review, document | `/validation:validate`, `/validation:code-review` |
 
-The modular architecture of this project makes adding functionalities relatively simple. The provided LLM.txt file also gives your language model the necessary context to get started right away.
+---
 
-The process involves three main parts:
+## Step-by-Step: Building a New Project
 
-## Part 1: Create the Route Module in Revit
+### Step 1: Define Your Project
 
-Create a new Python file within the `revit-mcp-python.extension/revit_mcp/` directory (e.g., `revit_mcp/your_module.py`). This module will contain all the related functions you want to expose.
+Start a conversation with Claude Code about what you want to build.
 
-```python
-# In revit-mcp-python.extension/revit_mcp/your_module.py
-
-# -*- coding: UTF-8 -*-
-"""
-Your Module for Revit MCP
-Handles your specific functionality.
-"""
-from pyrevit import routes, revit, DB
-import json
-import logging
-
-# Standard logger setup
-logger = logging.getLogger(__name__)
-
-def register_your_routes(api):
-    """Register all your routes with the API."""
-    
-    # ---- Example 1: A GET request for reading data ----
-    @api.route('/your_endpoint/', methods=["GET"])
-    def get_project_title(doc):
-        """Gets the project title from the Revit model."""
-        try:
-            value = doc.Title
-            return routes.make_response(data={"status": "success", "data": value})
-        except Exception as e:
-            logger.error("Get project title failed: {}".format(str(e)))
-            return routes.make_response(data={"error": str(e)}, status=500)
-    
-    # ---- Example 2: A POST request for modifying the model ----
-    @api.route('/modify_model/', methods=["POST"])
-    def modify_model(doc, request):
-        """Handles POST requests for modifying the Revit model."""
-        try:
-            data = json.loads(request.data) if isinstance(request.data, str) else request.data
-            
-            # Use a transaction for all model modifications
-            t = DB.Transaction(doc, "Modify Model via MCP")
-            t.Start()
-            
-            try:
-                element_id = data.get("element_id")
-                new_value = data.get("new_value")
-                element = doc.GetElement(DB.ElementId(int(element_id)))
-                param = element.LookupParameter("Comments")
-                param.Set(new_value)
-                
-                t.Commit()
-                return routes.make_response(data={"status": "success", "result": "Element modified."})
-            
-            except Exception as tx_error:
-                if t.HasStarted() and not t.HasEnded():
-                    t.RollBack()
-                raise tx_error
-                
-        except Exception as e:
-            logger.error("Modify model failed: {}".format(str(e)))
-            return routes.make_response(data={"error": str(e)}, status=500)
-    
-    logger.info("Your custom routes were registered successfully.")
+```bash
+claude
 ```
 
-## Part 2: Create the MCP Tool Module
+Discuss with Claude:
+- What problem does this solve?
+- Who is the target user?
+- What are the core features (MVP)?
+- What tech stack? (FastAPI, React, etc.)
 
-Create the corresponding tools for the MCP server in the `tools/` directory (e.g., `tools/your_tools.py`). This module will use the `revit_get` and `revit_post` helpers from `main.py`.
+### Step 2: Create Your PRD
 
-```python
-# In tools/your_tools.py
-# -*- coding: utf-8 -*-
-"""Your tools for the MCP server."""
+Use the `/create-prd` command to generate a Product Requirements Document.
 
-from mcp.server.fastmcp import Context
-from .utils import format_response
-
-def register_your_tools(mcp, revit_get, revit_post, revit_image=None):
-    """Register your tools with the MCP server."""
-    
-    # ---- Tool for the GET request ----
-    @mcp.tool()
-    async def get_revit_project_title(ctx: Context) -> str:
-        """
-        Retrieves the title of the currently open Revit project.
-        """
-        response = await revit_get("/your_endpoint/", ctx)
-        return format_response(response)
-    
-    # ---- Tool for the POST request ----
-    @mcp.tool()
-    async def modify_revit_element_comment(
-        element_id: int,
-        new_value: str,
-        ctx: Context = None
-    ) -> str:
-        """
-        Modifies the 'Comments' parameter of a specific element.
-        
-        Args:
-            element_id: The ID of the element to modify.
-            new_value: The new comment to apply to the element.
-        """
-        payload = {"element_id": element_id, "new_value": new_value}
-        response = await revit_post("/modify_model/", payload, ctx)
-        return format_response(response)
+```
+/create-prd
 ```
 
-## Part 3: Register Your New Modules
+Claude will ask clarifying questions and generate `.claude/PRD.md` with:
+- Project overview
+- User stories
+- Feature specifications
+- Technical requirements
+- API design
+- Database schema
 
-### 1. Register the Route Module
+**Review and refine the PRD** — this is your project blueprint.
 
-Open `revit-mcp-python.extension/startup.py` and add your new route registration function.
+### Step 3: Customize CLAUDE.md
 
-```python
-# In revit-mcp-python.extension/startup.py
+Update `CLAUDE.md` with your project specifics:
 
-# ... (other imports)
-# Import the registration function from your new module
-from revit_mcp.your_module import register_your_routes
+```markdown
+# My Project Name
 
-def register_routes():
-    """Register all MCP route modules"""
-    api = routes.API('revit_mcp')
-    try:
-        # ... (existing route registrations)
-        
-        # Register your new routes (this registers all functions inside)
-        register_your_routes(api)
-        
-        logger.info("All MCP routes registered successfully")
-    except Exception as e:
-        logger.error("Failed to register MCP routes: {}".format(str(e)))
-        raise
+Brief description of what this project does.
+
+## Tech Stack
+
+- **Backend**: Python 3.12+, FastAPI, SQLAlchemy, SQLite/Postgres
+- **Frontend**: React 18, Vite, Tailwind CSS, TanStack Query
+- **Testing**: pytest, Playwright
+
+## Project Structure
+
+(Fill in once scaffolded)
+
+## Commands
+
+(Add your specific dev commands)
+
+## Reference Documentation
+
+| Document | When to Read |
+|----------|--------------|
+| `.claude/PRD.md` | Understanding requirements |
+| `.claude/reference/fastapi-best-practices.md` | Building API endpoints |
+| ... | ... |
 ```
 
-### 2. Register the Tool Module
+### Step 4: Prime Claude
 
-Open `tools/__init__.py` and add your new tool registration function.
+Load the project context:
 
-```python
-# In tools/__init__.py
-
-# ... (other tool imports)
-# Import the registration function from your new tool module
-from .your_tools import register_your_tools
-
-def register_tools(mcp_server, revit_get_func, revit_post_func, revit_image_func):
-    """Register all tools with the MCP server"""
-    
-    # ... (existing tool registrations)
-    # Register your new tools (this registers all tools inside)
-    register_your_tools(mcp_server, revit_get_func, revit_post_func, revit_image_func)
-    
-    return mcp_server
+```
+/core_piv_loop:prime
 ```
 
+This command tells Claude to:
+- Read `CLAUDE.md`
+- Read `.claude/PRD.md`
+- Understand the codebase structure
+- Load relevant reference docs
 
-## Roadmap
+### Step 5: Plan Your First Feature
 
-This is a work in progress and more of a demonstration than a fully-featured product. Future improvements could include:
+Pick a feature from your PRD and create an implementation plan:
 
-- **Creating a Client inside Revit**
-- **Implementing compatibilities with other language Models**
-- **Authentication and security enhancements**
-- **More advanced Revit tools and capabilities**
-- **Better error handling and debugging features**
-- **Benchmarking with local models**
-- **Documentation and examples for common use cases**
-- **...**
+```
+/core_piv_loop:plan-feature
+```
 
-## Contributing
+Claude will:
+- Analyze the codebase
+- Break down the feature into tasks
+- Create a step-by-step implementation plan
+- Save the plan to `.claude/plans/`
 
-Contributions are welcome! Feel free to submit pull requests or open issues for any bugs or feature requests.
-Feel free to reach out to me if you have any questions, ideas
+### Step 6: Execute the Plan
+
+Implement the feature step-by-step:
+
+```
+/core_piv_loop:execute
+```
+
+Claude will:
+- Work through each task in the plan
+- Write code following the reference docs
+- Create tests as it goes
+- Ask for confirmation at key points
+
+### Step 7: Validate
+
+After implementation, run validation:
+
+```
+/validation:validate
+```
+
+This runs:
+- Linting (ruff)
+- Type checking
+- Unit tests
+- Integration tests
+- Build verification
+
+### Step 8: Code Review
+
+Get a technical review of your changes:
+
+```
+/validation:code-review
+```
+
+Fix any issues:
+
+```
+/validation:code-review-fix
+```
+
+### Step 9: Commit
+
+Create an atomic commit with proper formatting:
+
+```
+/commit
+```
+
+### Step 10: Repeat
+
+Go back to Step 5 for the next feature. Continue the PIV loop until your MVP is complete.
+
+---
+
+## Command Reference
+
+### Core PIV Loop
+
+| Command | Description |
+|---------|-------------|
+| `/core_piv_loop:prime` | Load project context and codebase understanding |
+| `/core_piv_loop:plan-feature` | Create implementation plan for a feature |
+| `/core_piv_loop:execute` | Execute the plan step-by-step |
+
+### Validation
+
+| Command | Description |
+|---------|-------------|
+| `/validation:validate` | Run full validation suite |
+| `/validation:code-review` | Technical review of changed files |
+| `/validation:code-review-fix` | Fix issues found in review |
+| `/validation:execution-report` | Generate post-implementation report |
+| `/validation:system-review` | Analyze implementation vs plan |
+
+### Bug Fixing
+
+| Command | Description |
+|---------|-------------|
+| `/github_bug_fix:rca` | Create root cause analysis for a GitHub issue |
+| `/github_bug_fix:implement-fix` | Implement fix based on RCA |
+
+### Utilities
+
+| Command | Description |
+|---------|-------------|
+| `/commit` | Create atomic commit with conventional format |
+| `/create-prd` | Generate PRD from conversation |
+| `/init-project` | Initialize project (install deps, start servers) |
+
+---
+
+## Tech Stack Defaults
+
+This template is configured for:
+
+| Layer | Default | Reference Doc |
+|-------|---------|---------------|
+| **Backend** | Python 3.12+, FastAPI, UV | `uv-python-workflow.md` |
+| **Database** | SQLite (dev) → Postgres (prod) | `sqlite-best-practices.md` |
+| **Frontend** | React 18, Vite, Tailwind | `react-frontend-best-practices.md` |
+| **Reverse Proxy** | Caddy | `caddy-patterns.md` |
+| **Deployment** | Docker Compose | `deployment-best-practices.md` |
+| **Testing** | pytest, Playwright | `testing-and-logging.md` |
+
+Customize the reference docs for your preferred stack.
+
+---
+
+## Adding Reference Documents
+
+The `.claude/reference/` directory contains best practices guides. Claude reads these when working on specific areas.
+
+To add your own:
+
+1. Create a markdown file in `.claude/reference/`
+2. Follow the existing format (table of contents, code examples, anti-patterns)
+3. Reference it in `CLAUDE.md`
+
+Example custom references:
+- `supabase-patterns.md` — Your Supabase integration patterns
+- `n8n-webhooks.md` — Automation trigger patterns
+- `kubernetes-deployment.md` — K8s deployment patterns
+
+---
+
+## Tips for Effective AI-Assisted Development
+
+### Do
+
+- ✅ **Be specific** in your PRD — vague requirements = vague code
+- ✅ **Review plans** before executing — catch issues early
+- ✅ **Validate frequently** — don't let bugs accumulate
+- ✅ **Keep CLAUDE.md updated** — it's Claude's memory
+- ✅ **Use reference docs** — they encode your patterns
+
+### Don't
+
+- ❌ **Skip the PRD** — you'll waste time on rework
+- ❌ **Execute without a plan** — leads to inconsistent code
+- ❌ **Ignore validation failures** — fix them immediately
+- ❌ **Let CLAUDE.md get stale** — outdated context = wrong code
+
+---
+
+## Customizing for Your Workflow
+
+### Different Tech Stack?
+
+1. Update reference docs in `.claude/reference/`
+2. Modify `CLAUDE.md` template sections
+3. Adjust `/init-project.md` for your setup commands
+
+### Different Branching Strategy?
+
+Modify `/commit.md` to match your workflow (GitFlow, trunk-based, etc.)
+
+### Different Testing Approach?
+
+Update `/validation:validate` command to run your test suite.
+
+---
+
+## Resources
+
+- [Claude Code Documentation](https://docs.anthropic.com/en/docs/claude-code)
+- [Context Engineering Guide](https://github.com/coleam00/context-engineering-intro)
+- [Cole Medin's YouTube](https://www.youtube.com/@ColeMedin) — Original workshop source
+
+---
+
+## Credits
+
+Based on [Cole Medin's AI Coding Workshop](https://github.com/coleam00/habit-tracker) template.
+
+Customized with Caddy, UV, and docker-compose patterns for self-hosted deployments.
